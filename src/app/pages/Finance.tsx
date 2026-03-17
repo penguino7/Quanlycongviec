@@ -28,7 +28,8 @@ import {
   Legend,
   CartesianGrid
 } from 'recharts';
-import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { ChevronDown, Check } from 'lucide-react';
 
 // Mock Data for Expenses from Google Sheets "Chi tiêu" tab
 const initialFinanceData = [
@@ -51,6 +52,18 @@ export const Finance = () => {
   const [data, setData] = useState(initialFinanceData);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsTypeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Stats Calculations
   const stats = useMemo(() => {
@@ -212,18 +225,41 @@ export const Finance = () => {
                   placeholder="Search note or category..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                 />
               </div>
-              <select 
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value as any)}
-                className="bg-gray-50 dark:bg-slate-800 border-none rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="all">All</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
+              
+              <div className="relative w-full sm:w-40" ref={dropdownRef}>
+                <button 
+                  onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+                  className="w-full flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all"
+                >
+                  <span className="capitalize">{filterType}</span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isTypeDropdownOpen && (
+                  <div className="absolute top-full mt-2 right-0 w-full min-w-[150px] bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    {['all', 'income', 'expense'].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => {
+                          setFilterType(type as any);
+                          setIsTypeDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-2.5 text-left text-sm font-bold flex items-center justify-between transition-colors ${
+                          filterType === type 
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' 
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        <span className="capitalize">{type}</span>
+                        {filterType === type && <Check className="w-4 h-4" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
