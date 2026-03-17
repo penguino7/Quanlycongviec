@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Database, RefreshCw, Save, ChevronDown, Plus, Trash2, X, Columns } from 'lucide-react';
+import { Database, RefreshCw, Save, ChevronDown, Plus, Trash2, X, Columns, Calendar as CalendarIcon } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import { parseISO, format, parse } from 'date-fns';
 
 // Mock API để giả lập Google Apps Script
 const mockGoogleSheetsAPI = {
@@ -181,7 +183,19 @@ export const SheetManager = () => {
     const value = formData[fieldName] || '';
     switch (fieldType) {
       case 'date':
-        return <input type="date" value={value} onChange={(e) => handleInputChange(fieldName, e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />;
+        return (
+          <div className="relative">
+            <DatePicker
+              selected={value ? parse(value, 'yyyy-MM-dd', new Date()) : null}
+              onChange={(date: Date | null) => handleInputChange(fieldName, date ? format(date, 'yyyy-MM-dd') : '')}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Select date..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 transition-all outline-none cursor-pointer"
+              wrapperClassName="w-full"
+            />
+            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          </div>
+        );
       case 'number':
         return <input type="number" value={value} onChange={(e) => handleInputChange(fieldName, e.target.value)} placeholder="Nhập số..." className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />;
       case 'select':
