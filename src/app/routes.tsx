@@ -6,6 +6,7 @@ import { AddTask } from "./pages/AddTask";
 import { Calendar } from "./pages/Calendar";
 import { Notifications } from "./pages/Notifications";
 import { SheetManager } from "./pages/SheetManager";
+import { Finance } from "./pages/Finance";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
       { path: "calendar", Component: Calendar },
       { path: "notifications", Component: Notifications },
       { path: "sheets", Component: SheetManager },
+      { path: "finance", Component: Finance },
     ],
   },
 ]);

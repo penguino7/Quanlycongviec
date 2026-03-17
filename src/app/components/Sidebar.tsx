@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router';
-import { LayoutDashboard, CheckSquare, PlusCircle, Settings, LogOut, CheckSquare2, X, Calendar, Bell, Database } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, PlusCircle, Settings, LogOut, CheckSquare2, X, Calendar, Bell, Database, Wallet } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,12 +9,13 @@ interface SidebarProps {
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const navItems = [
-    { name: 'Tổng quan', path: '/', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: 'Công việc', path: '/tasks', icon: <CheckSquare className="w-5 h-5" /> },
-    { name: 'Lịch', path: '/calendar', icon: <Calendar className="w-5 h-5" /> },
-    { name: 'Thông báo', path: '/notifications', icon: <Bell className="w-5 h-5" /> },
+    { name: 'Dashboard', path: '/', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: 'Tasks', path: '/tasks', icon: <CheckSquare className="w-5 h-5" /> },
+    { name: 'Calendar', path: '/calendar', icon: <Calendar className="w-5 h-5" /> },
+    { name: 'Finance', path: '/finance', icon: <Wallet className="w-5 h-5" /> },
+    { name: 'Notifications', path: '/notifications', icon: <Bell className="w-5 h-5" /> },
     { name: 'Google Sheets', path: '/sheets', icon: <Database className="w-5 h-5" /> },
-    { name: 'Thêm mới', path: '/add', icon: <PlusCircle className="w-5 h-5" /> },
+    { name: 'Add New', path: '/add', icon: <PlusCircle className="w-5 h-5" /> },
   ];
 
   return (
