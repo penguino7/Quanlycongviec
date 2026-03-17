@@ -214,7 +214,7 @@ export const AddTask = () => {
                   render={({ field }) => (
                     <DatePicker
                       selected={field.value ? parse(field.value, 'yyyy-MM-dd', new Date()) : null}
-                      onChange={(date) => {
+                      onChange={(date: Date | null) => {
                         field.onChange(date ? format(date, 'yyyy-MM-dd') : '');
                       }}
                       dateFormat="dd/MM/yyyy"
@@ -241,7 +241,7 @@ export const AddTask = () => {
                   render={({ field }) => (
                     <DatePicker
                       selected={field.value ? parse(field.value, 'yyyy-MM-dd', new Date()) : null}
-                      onChange={(date) => {
+                      onChange={(date: Date | null) => {
                         field.onChange(date ? format(date, 'yyyy-MM-dd') : '');
                       }}
                       dateFormat="dd/MM/yyyy"
