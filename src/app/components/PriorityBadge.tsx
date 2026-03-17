@@ -25,13 +25,13 @@ export const PriorityBadge = ({ priority, className = '', showIcon = true }: Pri
   const getPriorityLabel = () => {
     switch (priority) {
       case 'high':
-        return 'Cao';
+        return 'High';
       case 'medium':
-        return 'Trung bình';
+        return 'Medium';
       case 'low':
-        return 'Thấp';
+        return 'Low';
       default:
-        return 'Không rõ';
+        return 'Unknown';
     }
   };
 

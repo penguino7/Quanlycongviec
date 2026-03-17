@@ -15,6 +15,8 @@ export const StatusBadge = ({ status, className = '' }: StatusBadgeProps) => {
         return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
       case 'todo':
         return 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+      case 'failed':
+        return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20';
       default:
         return 'bg-gray-100 text-gray-700 border-gray-200';
     }
@@ -23,13 +25,15 @@ export const StatusBadge = ({ status, className = '' }: StatusBadgeProps) => {
   const getStatusLabel = () => {
     switch (status) {
       case 'done':
-        return 'Hoàn thành';
+        return 'Done';
       case 'in-progress':
-        return 'Đang làm';
+        return 'In Progress';
       case 'todo':
-        return 'Cần làm';
+        return 'Todo';
+      case 'failed':
+        return 'Overdue';
       default:
-        return 'Không rõ';
+        return 'Unknown';
     }
   };
 

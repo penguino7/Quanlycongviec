@@ -1,131 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTasks, Task } from '../context/TaskContext';
-import { Search, Filter, Plus, Edit2, Trash2, Calendar, Clock, AlertTriangle, ChevronDown, Check, GripVertical } from 'lucide-react';
+import { Search, Plus, Trash2, Calendar, Clock, AlertTriangle, ChevronDown, Check, CheckCircle2, PlayCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { format, parseISO } from 'date-fns';
 import { StatusBadge } from '../components/StatusBadge';
 import { PriorityBadge } from '../components/PriorityBadge';
-import { 
-  DndContext, 
-  closestCorners, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
-  useSensors,
-  DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
-  defaultDropAnimationSideEffects
-} from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  sortableKeyboardCoordinates, 
-  verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-
-// --- Sub-components ---
-
-const SortableTaskCard = ({ task, updateTask, deleteTask }: { task: Task, updateTask: any, deleteTask: any }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: task.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div 
-      ref={setNodeRef} 
-      style={style}
-      className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md transition-all p-4 flex flex-col group relative"
-    >
-      {/* Drag Handle */}
-      <div 
-        {...attributes} 
-        {...listeners}
-        className="absolute top-2 right-2 p-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing"
-      >
-        <GripVertical className="w-4 h-4" />
-      </div>
-
-      <div className="flex justify-between items-start mb-3 gap-2 pr-6">
-        <StatusBadge status={task.status} />
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button 
-            className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              if(confirm('Bạn có chắc chắn muốn xóa công việc này?')) {
-                deleteTask(task.id);
-              }
-            }}
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">{task.title}</h3>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2 flex-1">{task.description}</p>
-
-      <div className="mt-auto pt-3 border-t border-gray-50 dark:border-slate-800/50">
-        <div className="flex flex-col gap-2 text-xs font-medium">
-          <span className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-            <Calendar className="w-3 h-3" />
-            <span>{format(parseISO(task.dueDate), 'dd/MM/yyyy')}</span>
-          </span>
-          <PriorityBadge priority={task.priority} showIcon={true} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const KanbanColumn = ({ id, title, tasks, updateTask, deleteTask }: { id: string, title: string, tasks: Task[], updateTask: any, deleteTask: any }) => {
-  return (
-    <div className="flex flex-col min-w-[300px] w-full bg-gray-50/50 dark:bg-slate-800/20 rounded-2xl p-4 border border-gray-100 dark:border-slate-800/50">
-      <div className="flex items-center justify-between mb-4 px-1">
-        <div className="flex items-center gap-2">
-          <h2 className="font-bold text-gray-900 dark:text-white">{title}</h2>
-          <span className="px-2 py-0.5 text-xs font-medium bg-gray-200 dark:bg-slate-800 text-gray-600 dark:text-gray-400 rounded-full">
-            {tasks.length}
-          </span>
-        </div>
-      </div>
-
-      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-        <div className="flex-1 space-y-3 min-h-[200px]">
-          {tasks.map((task) => (
-            <SortableTaskCard 
-              key={task.id} 
-              task={task} 
-              updateTask={updateTask} 
-              deleteTask={deleteTask} 
-            />
-          ))}
-          {tasks.length === 0 && (
-            <div className="h-24 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-gray-400 text-xs">
-              Kéo thả vào đây
-            </div>
-          )}
-        </div>
-      </SortableContext>
-    </div>
-  );
-};
-
-// --- Main Page ---
 
 export const Tasks = () => {
   const { tasks, updateTask, deleteTask } = useTasks();
@@ -133,17 +12,6 @@ export const Tasks = () => {
   const [filterPriority, setFilterPriority] = useState<Task['priority'] | 'all'>('all');
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const priorityDropdownRef = useRef<HTMLDivElement>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -162,62 +30,89 @@ export const Tasks = () => {
     return matchesSearch && matchesPriority;
   });
 
-  const todoTasks = filteredTasks.filter(t => t.status === 'todo');
-  const inProgressTasks = filteredTasks.filter(t => t.status === 'in-progress');
-  const doneTasks = filteredTasks.filter(t => t.status === 'done');
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (!over) return;
-
-    const taskId = active.id as string;
-    const overId = over.id as string;
-
-    // Check if dragging over a column or another card
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
-
-    // Determine new status
-    let newStatus: Task['status'] | null = null;
-    
-    // If dropped on a column directly
-    if (['todo', 'in-progress', 'done'].includes(overId)) {
-      newStatus = overId as Task['status'];
-    } else {
-      // If dropped on another card, get its status
-      const overTask = tasks.find(t => t.id === overId);
-      if (overTask) {
-        newStatus = overTask.status;
-      }
-    }
-
-    if (newStatus && newStatus !== task.status) {
-      updateTask(taskId, { status: newStatus });
-    }
-  };
-
   const priorityOptions = [
-    { value: 'all', label: 'Mọi mức độ' },
-    { value: 'high', label: 'Cao' },
-    { value: 'medium', label: 'Trung bình' },
-    { value: 'low', label: 'Thấp' },
+    { value: 'all', label: 'All Priorities' },
+    { value: 'high', label: 'High' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'low', label: 'Low' },
   ];
 
   const getSelectedPriorityLabel = () => {
-    return priorityOptions.find(opt => opt.value === filterPriority)?.label || 'Mọi mức độ';
+    return priorityOptions.find(opt => opt.value === filterPriority)?.label || 'All Priorities';
   };
 
+  const renderTaskCard = (task: Task) => (
+    <div key={task.id} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md transition-all p-4 flex flex-col group">
+      <div className="flex justify-between items-start mb-3 gap-2">
+        <StatusBadge status={task.status} />
+        <button 
+          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+          onClick={() => {
+            if(confirm('Are you sure you want to delete this task?')) {
+              deleteTask(task.id);
+            }
+          }}
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">{task.title}</h3>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2 flex-1">{task.description}</p>
+
+      <div className="mt-auto pt-3 border-t border-gray-50 dark:border-slate-800/50 space-y-3">
+        <div className="flex flex-col gap-2 text-xs font-medium">
+          <span className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+            <Calendar className="w-3 h-3" />
+            <span>{format(parseISO(task.dueDate), 'dd/MM/yyyy')}</span>
+          </span>
+          <PriorityBadge priority={task.priority} showIcon={true} />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-1.5 pt-1">
+          {task.status !== 'in-progress' && task.status !== 'done' && (
+            <button
+              onClick={() => updateTask(task.id, { status: 'in-progress' })}
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg text-[10px] font-bold hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors uppercase tracking-wider"
+            >
+              <PlayCircle className="w-3 h-3" />
+              Progress
+            </button>
+          )}
+          {task.status !== 'done' && (
+            <button
+              onClick={() => updateTask(task.id, { status: 'done' })}
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] font-bold hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors uppercase tracking-wider"
+            >
+              <CheckCircle2 className="w-3 h-3" />
+              Done
+            </button>
+          )}
+          {task.status !== 'failed' && (
+            <button
+              onClick={() => updateTask(task.id, { status: 'failed' })}
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg text-[10px] font-bold hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors uppercase tracking-wider"
+            >
+              <XCircle className="w-3 h-3" />
+              Overdue
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Bảng công việc</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Quản lý theo phong cách Kanban Trello.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Task Board</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Manage and track your daily tasks effectively.</p>
         </div>
         <Link to="/add" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> 
-          <span>Tạo thẻ mới</span>
+          <span>Add New Task</span>
         </Link>
       </div>
 
@@ -227,8 +122,8 @@ export const Tasks = () => {
             <Search className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none h-full w-4 text-gray-400" />
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="Tìm thẻ..."
+              className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-gray-400"
+              placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -267,36 +162,14 @@ export const Tasks = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-x-auto pb-4">
-        <DndContext 
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="flex gap-6 h-full min-h-[500px]">
-            <KanbanColumn 
-              id="todo" 
-              title="Cần làm" 
-              tasks={todoTasks} 
-              updateTask={updateTask} 
-              deleteTask={deleteTask} 
-            />
-            <KanbanColumn 
-              id="in-progress" 
-              title="Đang làm" 
-              tasks={inProgressTasks} 
-              updateTask={updateTask} 
-              deleteTask={deleteTask} 
-            />
-            <KanbanColumn 
-              id="done" 
-              title="Hoàn thành" 
-              tasks={doneTasks} 
-              updateTask={updateTask} 
-              deleteTask={deleteTask} 
-            />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredTasks.length > 0 ? (
+          filteredTasks.map(task => renderTaskCard(task))
+        ) : (
+          <div className="col-span-full py-12 text-center bg-gray-50/50 dark:bg-slate-800/10 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-800/50">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">No tasks found matching your criteria.</p>
           </div>
-        </DndContext>
+        )}
       </div>
     </div>
   );

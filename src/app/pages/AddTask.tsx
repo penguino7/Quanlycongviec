@@ -50,23 +50,24 @@ export const AddTask = () => {
   };
 
   const statusOptions = [
-    { value: 'todo', label: 'Cần làm' },
-    { value: 'in-progress', label: 'Đang làm' },
-    { value: 'done', label: 'Hoàn thành' },
+    { value: 'todo', label: 'Todo' },
+    { value: 'in-progress', label: 'In Progress' },
+    { value: 'done', label: 'Done' },
+    { value: 'failed', label: 'Overdue' },
   ];
 
   const priorityOptions = [
-    { value: 'low', label: 'Thấp' },
-    { value: 'medium', label: 'Trung bình' },
-    { value: 'high', label: 'Cao' },
+    { value: 'low', label: 'Low' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
   ];
 
   const getStatusLabel = (value: string) => {
-    return statusOptions.find(opt => opt.value === value)?.label || 'Cần làm';
+    return statusOptions.find(opt => opt.value === value)?.label || 'Todo';
   };
 
   const getPriorityLabel = (value: string) => {
-    return priorityOptions.find(opt => opt.value === value)?.label || 'Trung bình';
+    return priorityOptions.find(opt => opt.value === value)?.label || 'Medium';
   };
 
   return (
@@ -74,13 +75,13 @@ export const AddTask = () => {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors border-0"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Thêm công việc mới</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Điền thông tin chi tiết cho công việc mới của bạn.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Task</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Fill in the details to add a new task to your board.</p>
         </div>
       </div>
 
@@ -90,14 +91,14 @@ export const AddTask = () => {
             <div>
               <label htmlFor="title" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Type className="w-4 h-4 text-gray-400" />
-                Tiêu đề công việc
+                Task Title
               </label>
               <input
                 id="title"
                 type="text"
                 className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 text-gray-900 dark:text-white transition-all outline-none ${errors.title ? 'border-red-300 dark:border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-slate-700 focus:border-indigo-500'}`}
-                placeholder="Nhập tiêu đề ngắn gọn..."
-                {...register('title', { required: 'Vui lòng nhập tiêu đề công việc' })}
+                placeholder="Enter a descriptive title..."
+                {...register('title', { required: 'Please enter a task title' })}
               />
               {errors.title && <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">{errors.title.message}</p>}
             </div>
@@ -105,13 +106,13 @@ export const AddTask = () => {
             <div>
               <label htmlFor="description" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <FileText className="w-4 h-4 text-gray-400" />
-                Mô tả chi tiết
+                Description
               </label>
               <textarea
                 id="description"
                 rows={4}
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none resize-none"
-                placeholder="Mô tả cụ thể những gì cần hoàn thành..."
+                placeholder="What exactly needs to be done?"
                 {...register('description')}
               />
             </div>
@@ -120,7 +121,7 @@ export const AddTask = () => {
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <CheckCircle2 className="w-4 h-4 text-gray-400" />
-                  Trạng thái
+                  Status
                 </label>
                 <div className="relative" ref={statusDropdownRef}>
                   <button
@@ -162,7 +163,7 @@ export const AddTask = () => {
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Flag className="w-4 h-4 text-gray-400" />
-                  Độ ưu tiên
+                  Priority
                 </label>
                 <div className="relative" ref={priorityDropdownRef}>
                   <button
@@ -204,12 +205,12 @@ export const AddTask = () => {
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <CalendarPlus className="w-4 h-4 text-gray-400" />
-                  Ngày bắt đầu
+                  Start Date
                 </label>
                 <Controller
                   name="startDate"
                   control={control}
-                  rules={{ required: 'Vui lòng chọn ngày bắt đầu' }}
+                  rules={{ required: 'Please select a start date' }}
                   render={({ field }) => (
                     <DatePicker
                       selected={field.value ? parse(field.value, 'yyyy-MM-dd', new Date()) : null}
@@ -217,10 +218,9 @@ export const AddTask = () => {
                         field.onChange(date ? format(date, 'yyyy-MM-dd') : '');
                       }}
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="Chọn ngày bắt đầu"
+                      placeholderText="Select start date"
                       className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none cursor-pointer ${errors.startDate ? 'border-red-300 dark:border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-slate-700 focus:border-indigo-500'}`}
                       wrapperClassName="w-full"
-                      calendarClassName="shadow-xl"
                     />
                   )}
                 />
@@ -232,12 +232,12 @@ export const AddTask = () => {
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Calendar className="w-4 h-4 text-gray-400" />
-                  Hạn chót
+                  Due Date
                 </label>
                 <Controller
                   name="dueDate"
                   control={control}
-                  rules={{ required: 'Vui lòng chọn ngày đến hạn' }}
+                  rules={{ required: 'Please select a due date' }}
                   render={({ field }) => (
                     <DatePicker
                       selected={field.value ? parse(field.value, 'yyyy-MM-dd', new Date()) : null}
@@ -245,10 +245,9 @@ export const AddTask = () => {
                         field.onChange(date ? format(date, 'yyyy-MM-dd') : '');
                       }}
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="Chọn hạn chót"
+                      placeholderText="Select due date"
                       className={`w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none cursor-pointer ${errors.dueDate ? 'border-red-300 dark:border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-slate-700 focus:border-indigo-500'}`}
                       wrapperClassName="w-full"
-                      calendarClassName="shadow-xl"
                     />
                   )}
                 />
@@ -261,16 +260,16 @@ export const AddTask = () => {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors focus:ring-2 focus:ring-gray-200 dark:focus:ring-slate-600 outline-none"
+              className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors outline-none"
             >
-              Hủy bỏ
+              Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 outline-none flex items-center gap-2 shadow-sm"
+              className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors outline-none flex items-center gap-2 shadow-sm border-0"
             >
               <Save className="w-4 h-4" />
-              Lưu công việc
+              Save Task
             </button>
           </div>
         </form>

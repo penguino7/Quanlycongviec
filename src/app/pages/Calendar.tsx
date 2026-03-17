@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
 import { useTasks } from '../context/TaskContext';
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { StatusBadge } from '../components/StatusBadge';
 import { PriorityBadge } from '../components/PriorityBadge';
 
@@ -11,12 +11,12 @@ export const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
-  // Lấy tất cả các ngày trong tháng hiện tại
+  // Get all days in the current month
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // Lấy các ngày từ tháng trước để fill vào calendar
+  // Previous month fill
   const startDay = monthStart.getDay();
   const previousMonthDays = Array.from({ length: startDay }, (_, i) => {
     const date = new Date(monthStart);
@@ -24,7 +24,7 @@ export const Calendar = () => {
     return date;
   });
 
-  // Lấy các ngày từ tháng sau
+  // Next month fill
   const totalCells = [...previousMonthDays, ...daysInMonth].length;
   const nextMonthDays = Array.from({ length: 42 - totalCells }, (_, i) => {
     const date = new Date(monthEnd);
@@ -34,7 +34,6 @@ export const Calendar = () => {
 
   const allDays = [...previousMonthDays, ...daysInMonth, ...nextMonthDays];
 
-  // Lấy công việc cho một ngày cụ thể
   const getTasksForDate = (date: Date) => {
     return tasks.filter(task => {
       try {
@@ -45,14 +44,11 @@ export const Calendar = () => {
     });
   };
 
-  // Kiểm tra xem ngày có công việc không
   const hasTasksOnDate = (date: Date) => {
     return getTasksForDate(date).length > 0;
   };
 
   const selectedDateTasks = getTasksForDate(selectedDate);
-
-
 
   const goToPreviousMonth = () => {
     const newMonth = new Date(currentMonth);
@@ -81,7 +77,7 @@ export const Calendar = () => {
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-3 md:mb-4 lg:mb-6 flex-shrink-0">
               <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
-                <span className="capitalize">{format(currentMonth, 'MMMM', { locale: vi })}</span>
+                <span className="capitalize">{format(currentMonth, 'MMMM', { locale: enUS })}</span>
                 <span className="text-gray-500 dark:text-gray-400 font-normal text-base md:text-xl">{format(currentMonth, 'yyyy')}</span>
               </h2>
               <div className="flex gap-1.5 md:gap-2">
@@ -93,9 +89,9 @@ export const Calendar = () => {
                 </button>
                 <button
                   onClick={goToToday}
-                  className="px-2 md:px-3 py-1.5 md:py-2 text-xs lg:text-sm bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg transition-colors font-medium"
+                  className="px-2 md:px-3 py-1.5 md:py-2 text-xs lg:text-sm bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-50 dark:hover:bg-indigo-600 text-white rounded-lg transition-colors font-medium border-0"
                 >
-                  Hôm nay
+                  Today
                 </button>
                 <button
                   onClick={goToNextMonth}
@@ -108,10 +104,10 @@ export const Calendar = () => {
 
             {/* Days of week */}
             <div className="grid grid-cols-7 gap-0.5 md:gap-1 lg:gap-2 mb-1.5 md:mb-2 flex-shrink-0">
-              {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
+              {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
                 <div
                   key={day}
-                  className="text-center text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400 py-1.5 md:py-2"
+                  className="text-center text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 py-1.5 md:py-2 uppercase tracking-wide"
                 >
                   {day}
                 </div>
@@ -131,7 +127,7 @@ export const Calendar = () => {
                     key={index}
                     onClick={() => setSelectedDate(day)}
                     className={`
-                      relative h-10 sm:h-12 lg:h-14 w-full rounded-md md:rounded-lg text-xs md:text-sm font-medium transition-all flex items-center justify-center
+                      relative h-10 sm:h-12 lg:h-14 w-full rounded-md md:rounded-lg text-xs md:text-sm font-medium transition-all flex items-center justify-center border-0
                       ${!isCurrentMonth ? 'text-gray-300 dark:text-gray-700' : 'text-gray-900 dark:text-gray-100'}
                       ${isSelected ? 'bg-indigo-600 text-white dark:bg-indigo-500' : 'hover:bg-gray-100 dark:hover:bg-slate-800'}
                       ${isTodayDate && !isSelected ? 'ring-2 ring-indigo-600 dark:ring-indigo-400' : ''}
@@ -154,7 +150,7 @@ export const Calendar = () => {
             <div className="flex items-center gap-2 mb-3 md:mb-4 flex-shrink-0">
               <CalendarIcon className="w-4 h-4 md:w-5 md:h-5 text-indigo-600 dark:text-indigo-400" />
               <h3 className="font-bold text-gray-900 dark:text-white text-sm md:text-base">
-                {format(selectedDate, 'dd MMMM yyyy', { locale: vi })}
+                {format(selectedDate, 'dd MMMM yyyy', { locale: enUS })}
               </h3>
             </div>
 
@@ -162,13 +158,13 @@ export const Calendar = () => {
               <div className="text-center py-6 md:py-8 flex-1 flex items-center justify-center">
                 <div>
                   <AlertCircle className="w-10 h-10 md:w-12 md:h-12 text-gray-300 dark:text-gray-600 mx-auto mb-2 md:mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">
-                    Không có công việc nào trong ngày này
+                  <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm px-4">
+                    No scheduled tasks for this date
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="space-y-2.5 md:space-y-3 overflow-y-auto flex-1">
+              <div className="space-y-2.5 md:space-y-3 overflow-y-auto flex-1 pr-1 custom-scrollbar">
                 {selectedDateTasks.map((task) => (
                   <div
                     key={task.id}
@@ -180,12 +176,12 @@ export const Calendar = () => {
                       </h4>
                       <StatusBadge status={task.status} />
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-xs mb-2 md:mb-3 line-clamp-2">
+                    <p className="text-gray-600 dark:text-gray-400 text-[10px] md:text-xs mb-2 md:mb-3 line-clamp-2 leading-relaxed">
                       {task.description}
                     </p>
                     <div className="flex items-center justify-between gap-2">
-                      <PriorityBadge priority={task.priority} showIcon={false} className="bg-gray-50 dark:bg-gray-500/10 px-2 py-1 rounded-full" />
-                      <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-xs">
+                       <PriorityBadge priority={task.priority} showIcon={false} className="bg-gray-50 dark:bg-gray-800/50 px-2 py-0.5 rounded-full border border-gray-100 dark:border-slate-700" />
+                      <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500 text-[10px]">
                         <Clock className="w-3 h-3" />
                         {format(parseISO(task.dueDate), 'HH:mm')}
                       </div>
