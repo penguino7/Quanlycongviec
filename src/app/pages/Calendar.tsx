@@ -3,6 +3,8 @@ import { Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
 import { useTasks } from '../context/TaskContext';
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { StatusBadge } from '../components/StatusBadge';
+import { PriorityBadge } from '../components/PriorityBadge';
 
 export const Calendar = () => {
   const { tasks } = useTasks();
@@ -50,31 +52,7 @@ export const Calendar = () => {
 
   const selectedDateTasks = getTasksForDate(selectedDate);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
-      case 'medium':
-        return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10';
-      case 'low':
-        return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10';
-      default:
-        return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-500/10';
-    }
-  };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'done':
-        return <span className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400">Hoàn thành</span>;
-      case 'in-progress':
-        return <span className="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">Đang làm</span>;
-      case 'todo':
-        return <span className="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-500/10 text-gray-700 dark:text-gray-400">Chưa làm</span>;
-      default:
-        return null;
-    }
-  };
 
   const goToPreviousMonth = () => {
     const newMonth = new Date(currentMonth);
@@ -200,15 +178,13 @@ export const Calendar = () => {
                       <h4 className="font-semibold text-gray-900 dark:text-white text-xs md:text-sm line-clamp-1">
                         {task.title}
                       </h4>
-                      {getStatusBadge(task.status)}
+                      <StatusBadge status={task.status} />
                     </div>
                     <p className="text-gray-600 dark:text-gray-400 text-xs mb-2 md:mb-3 line-clamp-2">
                       {task.description}
                     </p>
                     <div className="flex items-center justify-between gap-2">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(task.priority)}`}>
-                        {task.priority === 'high' ? 'Cao' : task.priority === 'medium' ? 'Trung bình' : 'Thấp'}
-                      </span>
+                      <PriorityBadge priority={task.priority} showIcon={false} className="bg-gray-50 dark:bg-gray-500/10 px-2 py-1 rounded-full" />
                       <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-xs">
                         <Clock className="w-3 h-3" />
                         {format(parseISO(task.dueDate), 'HH:mm')}

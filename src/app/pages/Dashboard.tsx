@@ -5,6 +5,7 @@ import { CheckCircle2, Clock, AlertCircle, TrendingUp, Calendar, MoreHorizontal 
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useTheme } from 'next-themes';
+import { StatusBadge } from '../components/StatusBadge';
 
 const COLORS = ['#10B981', '#F59E0B', '#EF4444'];
 
@@ -204,13 +205,7 @@ export const Dashboard = () => {
               </div>
 
               <div className="flex items-center gap-3 flex-shrink-0">
-                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
-                  task.status === 'done' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' :
-                  task.status === 'in-progress' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' :
-                  'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'
-                }`}>
-                  {task.status === 'done' ? 'Hoàn thành' : task.status === 'in-progress' ? 'Đang làm' : 'Cần làm'}
-                </span>
+                <StatusBadge status={task.status} />
               </div>
             </div>
           ))}
