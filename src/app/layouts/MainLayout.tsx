@@ -3,6 +3,7 @@ import { Outlet } from 'react-router';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
 import { TaskProvider } from '../context/TaskContext';
+import { NotificationService } from '../components/NotificationService';
 
 export const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,6 +18,7 @@ export const MainLayout = () => {
 
   return (
     <TaskProvider>
+      <NotificationService />
       <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-950 overflow-hidden font-sans transition-colors">
         <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
         <div className="flex-1 flex flex-col h-full overflow-hidden">

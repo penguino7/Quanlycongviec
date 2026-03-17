@@ -28,7 +28,7 @@ const initialTasks: Task[] = [
     status: 'in-progress',
     priority: 'high',
     startDate: '2026-03-16',
-    dueDate: '2026-03-20',
+    dueDate: '2026-03-17',
     createdAt: '2026-03-16T10:00:00Z',
   },
   {
