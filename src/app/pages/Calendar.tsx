@@ -89,7 +89,7 @@ export const Calendar = () => {
                 </button>
                 <button
                   onClick={goToToday}
-                  className="px-2 md:px-3 py-1.5 md:py-2 text-xs lg:text-sm bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-50 dark:hover:bg-indigo-600 text-white rounded-lg transition-colors font-medium border-0"
+                  className="px-2 md:px-3 py-1.5 md:py-2 text-xs lg:text-sm bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium border-0"
                 >
                   Today
                 </button>
