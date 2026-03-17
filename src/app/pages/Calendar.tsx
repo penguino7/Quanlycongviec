@@ -1,0 +1,226 @@
+import React, { useState } from 'react';
+import { Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
+import { useTasks } from '../context/TaskContext';
+import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO } from 'date-fns';
+import { vi } from 'date-fns/locale';
+
+export const Calendar = () => {
+  const { tasks } = useTasks();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+  // Lấy tất cả các ngày trong tháng hiện tại
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  // Lấy các ngày từ tháng trước để fill vào calendar
+  const startDay = monthStart.getDay();
+  const previousMonthDays = Array.from({ length: startDay }, (_, i) => {
+    const date = new Date(monthStart);
+    date.setDate(date.getDate() - (startDay - i));
+    return date;
+  });
+
+  // Lấy các ngày từ tháng sau
+  const totalCells = [...previousMonthDays, ...daysInMonth].length;
+  const nextMonthDays = Array.from({ length: 42 - totalCells }, (_, i) => {
+    const date = new Date(monthEnd);
+    date.setDate(date.getDate() + i + 1);
+    return date;
+  });
+
+  const allDays = [...previousMonthDays, ...daysInMonth, ...nextMonthDays];
+
+  // Lấy công việc cho một ngày cụ thể
+  const getTasksForDate = (date: Date) => {
+    return tasks.filter(task => {
+      try {
+        return isSameDay(parseISO(task.dueDate), date);
+      } catch {
+        return false;
+      }
+    });
+  };
+
+  // Kiểm tra xem ngày có công việc không
+  const hasTasksOnDate = (date: Date) => {
+    return getTasksForDate(date).length > 0;
+  };
+
+  const selectedDateTasks = getTasksForDate(selectedDate);
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
+      case 'medium':
+        return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10';
+      case 'low':
+        return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10';
+      default:
+        return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-500/10';
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'done':
+        return <span className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400">Hoàn thành</span>;
+      case 'in-progress':
+        return <span className="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">Đang làm</span>;
+      case 'todo':
+        return <span className="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-500/10 text-gray-700 dark:text-gray-400">Chưa làm</span>;
+      default:
+        return null;
+    }
+  };
+
+  const goToPreviousMonth = () => {
+    const newMonth = new Date(currentMonth);
+    newMonth.setMonth(newMonth.getMonth() - 1);
+    setCurrentMonth(newMonth);
+  };
+
+  const goToNextMonth = () => {
+    const newMonth = new Date(currentMonth);
+    newMonth.setMonth(newMonth.getMonth() + 1);
+    setCurrentMonth(newMonth);
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentMonth(today);
+    setSelectedDate(today);
+  };
+
+  return (
+    <div className="h-full flex items-center justify-center overflow-hidden p-4 lg:p-6">
+      <div className="w-full max-w-6xl">
+        <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
+          {/* Calendar */}
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-4 lg:p-6 max-h-[650px] flex flex-col">
+            {/* Calendar Header */}
+            <div className="flex items-center justify-between mb-4 lg:mb-6 flex-shrink-0">
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+                <span className="capitalize">{format(currentMonth, 'MMMM', { locale: vi })}</span>
+                <span className="text-gray-500 dark:text-gray-400 font-normal ml-2">{format(currentMonth, 'yyyy')}</span>
+              </h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={goToPreviousMonth}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
+                >
+                  ←
+                </button>
+                <button
+                  onClick={goToToday}
+                  className="px-3 py-2 text-xs lg:text-sm bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg transition-colors font-medium"
+                >
+                  Hôm nay
+                </button>
+                <button
+                  onClick={goToNextMonth}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+
+            {/* Days of week */}
+            <div className="grid grid-cols-7 gap-1 lg:gap-2 mb-2 flex-shrink-0">
+              {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
+                <div
+                  key={day}
+                  className="text-center text-xs lg:text-sm font-semibold text-gray-500 dark:text-gray-400 py-2"
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1 lg:gap-2 flex-1 content-start">
+              {allDays.map((day, index) => {
+                const isCurrentMonth = isSameMonth(day, currentMonth);
+                const isTodayDate = isToday(day);
+                const isSelected = isSameDay(day, selectedDate);
+                const hasTasks = hasTasksOnDate(day);
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedDate(day)}
+                    className={`
+                      relative h-12 lg:h-14 w-full rounded-lg text-xs lg:text-sm font-medium transition-all flex items-center justify-center
+                      ${!isCurrentMonth ? 'text-gray-300 dark:text-gray-700' : 'text-gray-900 dark:text-gray-100'}
+                      ${isSelected ? 'bg-indigo-600 text-white dark:bg-indigo-500' : 'hover:bg-gray-100 dark:hover:bg-slate-800'}
+                      ${isTodayDate && !isSelected ? 'ring-2 ring-indigo-600 dark:ring-indigo-400' : ''}
+                    `}
+                  >
+                    <span className="block">{format(day, 'd')}</span>
+                    {hasTasks && (
+                      <span className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full ${
+                        isSelected ? 'bg-white' : 'bg-indigo-600 dark:bg-indigo-400'
+                      }`} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Selected Date Tasks */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-4 lg:p-6 flex flex-col max-h-[600px]">
+            <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+              <CalendarIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="font-bold text-gray-900 dark:text-white text-sm lg:text-base">
+                {format(selectedDate, 'dd MMMM yyyy', { locale: vi })}
+              </h3>
+            </div>
+
+            {selectedDateTasks.length === 0 ? (
+              <div className="text-center py-8 flex-1 flex items-center justify-center">
+                <div>
+                  <AlertCircle className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    Không có công việc nào trong ngày này
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 overflow-y-auto flex-1">
+                {selectedDateTasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                        {task.title}
+                      </h4>
+                      {getStatusBadge(task.status)}
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs mb-3 line-clamp-2">
+                      {task.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(task.priority)}`}>
+                        {task.priority === 'high' ? 'Cao' : task.priority === 'medium' ? 'Trung bình' : 'Thấp'}
+                      </span>
+                      <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-xs">
+                        <Clock className="w-3 h-3" />
+                        {format(parseISO(task.dueDate), 'HH:mm')}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

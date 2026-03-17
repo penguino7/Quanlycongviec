@@ -1,0 +1,5 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+@import './datepicker.css';
+@import 'react-datepicker/dist/react-datepicker.css';
