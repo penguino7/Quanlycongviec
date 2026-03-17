@@ -65,7 +65,7 @@ export const Dashboard = () => {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={pieData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} stroke={isDark ? '#94a3b8' : '#64748b'} />
+                <XAxis dataKey="name" hide />
                 <YAxis axisLine={false} tickLine={false} stroke={isDark ? '#94a3b8' : '#64748b'} />
                 <Tooltip 
                   cursor={{ fill: isDark ? '#334155' : '#f1f5f9' }} 
