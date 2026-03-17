@@ -3,8 +3,9 @@ import { useTasks } from '../context/TaskContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { CheckCircle2, Clock, AlertCircle, TrendingUp, Calendar, XCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { useTheme } from 'next-themes';
+import { Link } from 'react-router';
 import { StatusBadge } from '../components/StatusBadge';
 
 const COLORS = ['#10B981', '#F59E0B', '#64748b', '#EF4444'];
