@@ -74,6 +74,19 @@ The app will be available at `http://localhost:5173`.
 npm run build
 ```
 
+### 5. Configure Apps Script API (Optional but recommended)
+This project now supports real backend data via Google Apps Script Web App.
+
+1. Open [apps-script/README.md](./apps-script/README.md) and deploy the script.
+2. Create `.env.local` in project root:
+```bash
+VITE_GAS_WEB_APP_URL=https://script.google.com/macros/s/xxx/exec
+VITE_GAS_API_TOKEN=your_token_here
+```
+3. Restart `npm run dev`.
+
+If env vars are missing, the app automatically runs in local fallback mode.
+
 ---
 
 ## 📁 Project Structure

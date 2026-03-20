@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTasks, Task } from '../context/TaskContext';
-import { Search, Plus, Trash2, Calendar, Clock, AlertTriangle, ChevronDown, Check, CheckCircle2, PlayCircle, XCircle } from 'lucide-react';
+import { Search, Plus, Trash2, Calendar, Clock, AlertTriangle, ChevronDown, Check, CheckCircle2, PlayCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { format, parseISO } from 'date-fns';
 import { StatusBadge } from '../components/StatusBadge';
@@ -47,9 +47,14 @@ export const Tasks = () => {
         <StatusBadge status={task.status} />
         <button 
           className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-          onClick={() => {
+          onClick={async () => {
             if(confirm('Are you sure you want to delete this task?')) {
-              deleteTask(task.id);
+              try {
+                await deleteTask(task.id);
+              } catch (error) {
+                console.error('Failed to delete task:', error);
+                alert('Failed to delete task. Please check API connection.');
+              }
             }
           }}
         >
@@ -66,6 +71,12 @@ export const Tasks = () => {
             <Calendar className="w-3 h-3" />
             <span>{format(parseISO(task.dueDate), 'dd/MM/yyyy')}</span>
           </span>
+          {task.dueAt && (
+            <span className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+              <Clock className="w-3 h-3" />
+              <span>{format(parseISO(task.dueAt), 'HH:mm')}</span>
+            </span>
+          )}
           <PriorityBadge priority={task.priority} showIcon={true} />
         </div>
 
@@ -73,7 +84,13 @@ export const Tasks = () => {
         <div className="flex gap-1.5 pt-1">
           {task.status !== 'in-progress' && task.status !== 'done' && (
             <button
-              onClick={() => updateTask(task.id, { status: 'in-progress' })}
+              onClick={async () => {
+                try {
+                  await updateTask(task.id, { status: 'in-progress' });
+                } catch (error) {
+                  console.error('Failed to update task:', error);
+                }
+              }}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg text-[10px] font-bold hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors uppercase tracking-wider"
             >
               <PlayCircle className="w-3 h-3" />
@@ -82,20 +99,17 @@ export const Tasks = () => {
           )}
           {task.status !== 'done' && (
             <button
-              onClick={() => updateTask(task.id, { status: 'done' })}
+              onClick={async () => {
+                try {
+                  await updateTask(task.id, { status: 'done' });
+                } catch (error) {
+                  console.error('Failed to update task:', error);
+                }
+              }}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] font-bold hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors uppercase tracking-wider"
             >
               <CheckCircle2 className="w-3 h-3" />
               Done
-            </button>
-          )}
-          {task.status !== 'failed' && (
-            <button
-              onClick={() => updateTask(task.id, { status: 'failed' })}
-              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg text-[10px] font-bold hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors uppercase tracking-wider"
-            >
-              <XCircle className="w-3 h-3" />
-              Overdue
             </button>
           )}
         </div>

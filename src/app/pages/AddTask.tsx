@@ -6,7 +6,16 @@ import { ArrowLeft, Save, Calendar, Type, FileText, Flag, CheckCircle2, Calendar
 import { format, parse } from 'date-fns';
 import DatePicker from 'react-datepicker';
 
-type TaskFormInputs = Omit<Task, 'id' | 'createdAt'>;
+type TaskFormInputs = {
+  title: string;
+  description: string;
+  status: Task['status'];
+  priority: Task['priority'];
+  startDate: string;
+  dueDate: string;
+  dueTime: string;
+  syncCalendar: boolean;
+};
 
 export const AddTask = () => {
   const { addTask } = useTasks();
@@ -18,6 +27,8 @@ export const AddTask = () => {
       priority: 'medium',
       startDate: format(new Date(), 'yyyy-MM-dd'),
       dueDate: format(new Date(), 'yyyy-MM-dd'),
+      dueTime: '17:00',
+      syncCalendar: true,
     }
   });
 
@@ -44,16 +55,29 @@ export const AddTask = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const onSubmit = (data: TaskFormInputs) => {
-    addTask(data);
-    navigate('/tasks');
+  const onSubmit = async (data: TaskFormInputs) => {
+    try {
+      await addTask({
+        title: data.title,
+        description: data.description,
+        status: data.status,
+        priority: data.priority,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        dueAt: `${data.dueDate}T${data.dueTime}:00`,
+        syncCalendar: data.syncCalendar,
+      });
+      navigate('/tasks');
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      alert('Failed to save task. Please check API configuration.');
+    }
   };
 
   const statusOptions = [
     { value: 'todo', label: 'Todo' },
     { value: 'in-progress', label: 'In Progress' },
     { value: 'done', label: 'Done' },
-    { value: 'failed', label: 'Overdue' },
   ];
 
   const priorityOptions = [
@@ -228,7 +252,7 @@ export const AddTask = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Calendar className="w-4 h-4 text-gray-400" />
@@ -252,6 +276,32 @@ export const AddTask = () => {
                   )}
                 />
                 {errors.dueDate && <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">{errors.dueDate.message}</p>}
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  Due Time
+                </label>
+                <input
+                  type="time"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none"
+                  {...register('dueTime', { required: 'Please select a due time' })}
+                />
+                {errors.dueTime && <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">{errors.dueTime.message}</p>}
+              </div>
+
+              <div className="flex items-end">
+                <label className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    {...register('syncCalendar')}
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                    Sync to Google Calendar
+                  </span>
+                </label>
               </div>
             </div>
           </div>
